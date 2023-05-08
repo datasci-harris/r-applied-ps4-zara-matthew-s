@@ -1,0 +1,62 @@
+---
+title: "Add Pset name here"
+author: "Your Name Here"
+date: "Date Here"
+output: pdf_document
+---
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+<!-- .Rmd files use  markdown, a text mark up language, to provide formating.-->
+
+<!--Text include within these strange arrows are comments and will not show up when you knit-->
+
+# Front matter
+
+This submission is my work alone and complies with the 30535 integrity policy.
+
+Add your initials to indicate your agreement: \<\<\_\>\>
+
+Upload your collaborators here: https://forms.gle/3mH1ofZZj9ZCgBHb8
+
+Late coins used this pset: 0. Late coins left: 4. <!--You may use one for a given assignment.-->
+
+# R for Data Science Exercises
+
+<!--Note: Please do not restate questions in your submissions, directly write your answer--->
+
+## First Section
+
+<!--(Notice the use of two `##`)-->
+
+1.  YOUR TEXT ANSWER GOES HERE (Please delete)
+
+-   The dash symbol creates unordered list
+
+-   Another example
+
+    1.  numbering creates ordered list
+    2.  Another example
+
+    -   like This
+    -   Like this as well
+
+**Delete all the text in `1.` before you write your answer**
+
+```{r}
+# YOUR CODE GOES HERE  (Please delete)
+ggplot(mpg, aes(manufacturer)) + geom_bar()
+```
+
+
+## Second Section
+
+1.  YOUR TEXT ANSWER GOES HERE (Please delete)
+
+```{r}
+# YOUR CODE GOES HERE  (Please delete)
+ggplot(mtcars, aes(factor(cyl), mpg)) + geom_violin(aes(fill=mpg))
+```
+
