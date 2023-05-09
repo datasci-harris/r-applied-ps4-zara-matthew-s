@@ -51,17 +51,30 @@ dfw <- read_rds("/Users/mattida6/Desktop/GitHub/waze_data.rds")
 
 # 1
 
-It appears that the data format being used is JSON (JavaScript Object Notation). JSON is a text-based data interchange format that is used to represent data in a structured manner. JSON is different from other file formats such as CSV (Comma-Separated Values) in several ways:
+It appears that the data format being used is JSON (JavaScript Object Notation). 
+JSON is a text-based data interchange format that is used to represent data in 
+a structured manner. JSON is different from other file formats such as 
+CSV (Comma-Separated Values) in several ways:
 
-1. Structure: CSV is a flat file format that uses a comma (or other delimiter) to separate values in a row, while JSON is a hierarchical data format that uses nested objects and arrays to represent complex data structures.
+1. Structure: CSV is a flat file format that uses a comma (or other delimiter) 
+to separate values in a row, while JSON is a hierarchical data format that uses 
+nested objects and arrays to represent complex data structures.
 
-2. Data Types: CSV typically represents all data as text, while JSON supports a wider range of data types, including numbers, booleans, strings, arrays, and objects.
+2. Data Types: CSV typically represents all data as text, while JSON supports 
+a wider range of data types, including numbers, booleans, strings, arrays, 
+and objects.
 
-3. Readability: JSON is often easier to read and understand than CSV because it uses a structured format with clearly defined objects and attributes.
+3. Readability: JSON is often easier to read and understand than CSV 
+because it uses a structured format with clearly defined objects and attributes.
 
-4. Flexibility: JSON is a more flexible format than CSV because it can represent complex data structures and allows for the inclusion of metadata, such as attribute names and data types.
+4. Flexibility: JSON is a more flexible format than CSV because it can 
+represent complex data structures and allows for the inclusion of metadata,
+such as attribute names and data types.
 
-Overall, JSON is a more robust and versatile data format than CSV, making it well-suited for applications that require complex data structures and the ability to include metadata. However, CSV remains a popular format for simple data sets because of its simplicity and wide support.
+Overall, JSON is a more robust and versatile data format than CSV,
+making it well-suited for applications that require complex data structures 
+and the ability to include metadata. However, CSV remains a popular format for 
+simple data sets because of its simplicity and wide support.
 
 # 2
 
@@ -91,8 +104,42 @@ names(lf_json)
 unique(sapply(lf_json, class))
 ```
 
-
 ## 5 Data cleaning 
+
+# 1
+```{r message=FALSE, warning=FALSE}
+# Convert the date column to a date object
+dfw$date <- as.Date(dfw$ts)
+
+# Modify n_max and dates to filter for the specified date range
+dfw_subset <- subset(dfw, date >= as.Date("2021-03-01") & date <= as.Date("2021-12-31"))
+
+# Check the number of rows in the subsetted data frame
+nrow(dfw_subset)  # should be 737,357
+```
+
+# 2
+```{r message=FALSE, warning=FALSE}
+# Get a list of unique cities in the data set
+unique_cities_dfw <- unique(dfw$city)
+
+# Print the list of unique cities
+print(unique_cities_dfw)
+```
+
+# 3
+
+```{r message=FALSE, warning=FALSE}
+# Separate the geo column into latitude and longitude columns
+dfw <- tidyr::separate(dfw, geo, into = c("latitude", "longitude"), sep = ",")
+
+# Convert the latitude and longitude columns to numeric values
+dfw <- dplyr::mutate(dfw, latitude = as.numeric(latitude), longitude = as.numeric(longitude))
+```
+
+# 4
+
+
 ## 6 Waze vision zero
 ## 7 Waze single event
 ## 8 Waze aggregate over multiple events 
