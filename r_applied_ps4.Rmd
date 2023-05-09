@@ -5,14 +5,6 @@ date: "13th May 2023"
 output: pdf_document
 ---
 
-```{r message=FALSE, warning=FALSE}
-
-install.packages("readr")
-library(readr)
-dfw <- read_rds("/Users/mattida6/Desktop/GitHub/waze_data.rds")
-
-```
-
 # Front matter
 
 This submission is my work alone and complies with the 30535 integrity policy.
@@ -44,7 +36,62 @@ changed in two different ways. This requires manual intervention to resolve
 the conflict by editing the file to incorporate both changes.
 
 ## 3 Obtaining data from cloud using SQL
+
+# 1
+
+```{r message=FALSE, warning=FALSE}
+
+install.packages("readr")
+library(readr)
+dfw <- read_rds("/Users/mattida6/Desktop/GitHub/waze_data.rds")
+
+```
+
 ## 4 Data exploration in JSON
+
+# 1
+
+It appears that the data format being used is JSON (JavaScript Object Notation). JSON is a text-based data interchange format that is used to represent data in a structured manner. JSON is different from other file formats such as CSV (Comma-Separated Values) in several ways:
+
+1. Structure: CSV is a flat file format that uses a comma (or other delimiter) to separate values in a row, while JSON is a hierarchical data format that uses nested objects and arrays to represent complex data structures.
+
+2. Data Types: CSV typically represents all data as text, while JSON supports a wider range of data types, including numbers, booleans, strings, arrays, and objects.
+
+3. Readability: JSON is often easier to read and understand than CSV because it uses a structured format with clearly defined objects and attributes.
+
+4. Flexibility: JSON is a more flexible format than CSV because it can represent complex data structures and allows for the inclusion of metadata, such as attribute names and data types.
+
+Overall, JSON is a more robust and versatile data format than CSV, making it well-suited for applications that require complex data structures and the ability to include metadata. However, CSV remains a popular format for simple data sets because of its simplicity and wide support.
+
+# 2
+
+```{r message=FALSE, warning=FALSE}
+library(jsonlite)
+lf_json <- fromJSON("/Users/mattida6/Desktop/stats_code/69c3e9b3-182c-4ec9-a5f3-c0e176568a3d.json")
+```
+
+As for why we can't convert the JSON feed directly to a tibble, it's because 
+a tibble requires a rectangular data structure, where each column has the same
+length and data type. In contrast, JSON can represent complex hierarchical data 
+structures with varying data types. While it is possible to convert a JSON 
+object to a tibble using the as_tibble() function from the tidyjson package, 
+this requires some additional data wrangling to ensure that the resulting 
+tibble is rectangular and well-structured.
+
+# 3
+
+```{r message=FALSE, warning=FALSE}
+# Get the length of the list
+length(lf_json)
+
+# Get the names of each item in the list
+names(lf_json)
+
+# Check which items in the list can be converted to tibbles
+unique(sapply(lf_json, class))
+```
+
+
 ## 5 Data cleaning 
 ## 6 Waze vision zero
 ## 7 Waze single event
