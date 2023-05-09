@@ -6,20 +6,18 @@ output: pdf_document
 ---
 
 ```{r message=FALSE, warning=FALSE}
+
 install.packages("readr")
 library(readr)
 dfw <- read_rds("/Users/mattida6/Desktop/GitHub/waze_data.rds")
+
 ```
-
-<!-- .Rmd files use  markdown, a text mark up language, to provide formating.-->
-
-<!--Text include within these strange arrows are comments and will not show up when you knit-->
 
 # Front matter
 
 This submission is my work alone and complies with the 30535 integrity policy.
 
-Add your initials to indicate your agreement: \<\<\_\>\>
+Add your initials to indicate your agreement: MS
 
 Upload your collaborators here: https://forms.gle/3mH1ofZZj9ZCgBHb8
 
@@ -29,36 +27,26 @@ Late coins used this pset: 0. Late coins left: 4. <!--You may use one for a give
 
 <!--Note: Please do not restate questions in your submissions, directly write your answer--->
 
-## First Section
-
-<!--(Notice the use of two `##`)-->
-
-1.  YOUR TEXT ANSWER GOES HERE (Please delete)
-
--   The dash symbol creates unordered list
-
--   Another example
-
-    1.  numbering creates ordered list
-    2.  Another example
-
-    -   like This
-    -   Like this as well
-
-**Delete all the text in `1.` before you write your answer**
-
 ```{r}
-# YOUR CODE GOES HERE  (Please delete)
-ggplot(mpg, aes(manufacturer)) + geom_bar()
+
 ```
 
+## 1 Prelim questions
+## 2 git practice
 
-## Second Section
+# 1
 
-1.  YOUR TEXT ANSWER GOES HERE (Please delete)
+The merge conflict occurred because both Partner A and Partner B made changes 
+to the same line of the file in their respective branches, which conflicted 
+with each other. As a result, when Partner A tried to merge Partner B's 
+changes into their branch, there was a conflict because the same line was 
+changed in two different ways. This requires manual intervention to resolve 
+the conflict by editing the file to incorporate both changes.
 
-```{r}
-# YOUR CODE GOES HERE  (Please delete)
-ggplot(mtcars, aes(factor(cyl), mpg)) + geom_violin(aes(fill=mpg))
-```
-
+## 3 Obtaining data from cloud using SQL
+## 4 Data exploration in JSON
+## 5 Data cleaning 
+## 6 Waze vision zero
+## 7 Waze single event
+## 8 Waze aggregate over multiple events 
+##
