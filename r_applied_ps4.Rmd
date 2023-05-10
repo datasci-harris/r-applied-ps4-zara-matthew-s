@@ -4,28 +4,6 @@ author: "Zara"
 date: "13th May 2023"
 output: pdf_document
 ---
-
-```{r message=FALSE, warning=FALSE}
-rm(list=ls())
-
-install.packages("bigrquery")
-library(bigrquery)
-library(tidyverse)
-
-billing_and_proj_id <- "ganong-teaching-343718"
-
-sql <- "SELECT
-  *
-FROM `waze-public-dataset.partner_UniversityofChicago.view_alerts_clustered`
-WHERE city = 'Chicago, IL' AND date(ts) = '2023-02-01'"
-
-tbl_waze <- bq_project_query(billing_and_proj_id, sql)
-
-system.time(all_alerts <- bq_table_download(tbl_waze, n_max = 10))
-
-
-```
-
 <!-- .Rmd files use  markdown, a text mark up language, to provide formating.-->
 
 <!--Text include within these strange arrows are comments and will not show up when you knit-->
@@ -39,6 +17,57 @@ Add your initials to indicate your agreement: \<\<\_\>\>
 Upload your collaborators here: https://forms.gle/3mH1ofZZj9ZCgBHb8
 
 Late coins used this pset: 0. Late coins left: 4. <!--You may use one for a given assignment.-->
+
+
+```{r message=FALSE, warning=FALSE}
+rm(list=ls())
+
+install.packages("bigrquery")
+library(bigrquery)
+library(tidyverse)
+library(testthat)
+rm(list=ls())
+install.packages("readr")
+library(readr)
+dfw<- read_rds("waze_data.rds")
+
+```
+
+
+## 4 Data exploration in JSON 
+```{r}
+
+
+```
+
+
+## 5 Data Cleaning 
+5.1 
+```{r}
+test_that(
+  "we have the right number of row",
+  expect_equal(nrow(dfw),737357))
+
+```
+5.2 The data covers the city of chicago 
+```{r}
+
+city_number<-dfw|>
+  distinct(city)|>
+  print()
+```
+5.3 
+```{r}
+dfw_long_lat <- dfw %>%
+  mutate(latitude = as.numeric(str_extract(geo, "-?\\d+\\.\\d+(?=\\s)")),
+         longitude = as.numeric(str_extract(geo, "(?<=\\s)-?\\d+\\.\\d+")))
+
+
+
+```
+
+
+
 
 # R for Data Science Exercises
 
