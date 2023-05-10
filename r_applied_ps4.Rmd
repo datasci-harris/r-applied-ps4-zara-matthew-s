@@ -21,22 +21,19 @@ Late coins used this pset: 0. Late coins left: 4. <!--You may use one for a give
 
 ```{r message=FALSE, warning=FALSE}
 rm(list=ls())
-
+install.packages("anytime")
 install.packages("bigrquery")
+install.packages("stringr")
 library(bigrquery)
 library(tidyverse)
 library(testthat)
+library(ggplot2)
+library(dplyr)
+library(lubridate)
 rm(list=ls())
 install.packages("readr")
 library(readr)
 dfw<- read_rds("waze_data.rds")
-
-```
-
-
-## 4 Data exploration in JSON 
-```{r}
-
 
 ```
 
@@ -56,18 +53,51 @@ city_number<-dfw|>
   distinct(city)|>
   print()
 ```
-5.3 
+5.3 Separate columns for longitude and latitude created. 
 ```{r}
-dfw_long_lat <- dfw %>%
-  mutate(latitude = as.numeric(str_extract(geo, "-?\\d+\\.\\d+(?=\\s)")),
-         longitude = as.numeric(str_extract(geo, "(?<=\\s)-?\\d+\\.\\d+")))
+dfw <- dfw |>
+  mutate(longitude = as.numeric(str_extract(geo, "-?\\d+\\.\\d+(?=\\s)")),
+         latitude = as.numeric(str_extract(geo, "(?<=\\s)-?\\d+\\.\\d+")))|>
+  relocate(longitude, latitude)|>
+  print()
 
 
 
 ```
+5.4 Alerts are most common at night post fromn 20:00 hours to 22:00 hours.
+
+```{r}
+
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+
+dfw <- dfw |>
+  mutate(hour = hour(ymd_hms(ts)))
+
+ggplot(dfw, aes(x = hour, fill = type)) +
+  geom_bar() +
+  labs(x = "Hour of Day", y = "Number of Alerts", fill = "Alert Type") +
+  ggtitle("Number of Alerts by Hour of Day") +
+  theme_minimal()+ 
+  scale_x_continuous(breaks = seq(0, 23, by = 1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+
+5.5 The alerts are in central time zones , 
+```{r}
+dfw <- dfw |>
+  mutate(
+    ts = as.POSIXct(ts, format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+    ts_ct = with_tz(ts, "America/Chicago"),
+    ts_ct_rounded = round_date(ts_ct, "5 minutes")
+  )
 
 
+```
 
+6.1 
 
 # R for Data Science Exercises
 
