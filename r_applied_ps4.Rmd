@@ -5,36 +5,11 @@ date: "13th May 2023"
 output: pdf_document
 ---
 
-```{r message=FALSE, warning=FALSE}
-rm(list=ls())
-
-install.packages("bigrquery")
-library(bigrquery)
-library(tidyverse)
-
-billing_and_proj_id <- "ganong-teaching-343718"
-
-sql <- "SELECT
-  *
-FROM `waze-public-dataset.partner_UniversityofChicago.view_alerts_clustered`
-WHERE city = 'Chicago, IL' AND date(ts) = '2023-02-01'"
-
-tbl_waze <- bq_project_query(billing_and_proj_id, sql)
-
-system.time(all_alerts <- bq_table_download(tbl_waze, n_max = 10))
-
-
-```
-
-<!-- .Rmd files use  markdown, a text mark up language, to provide formating.-->
-
-<!--Text include within these strange arrows are comments and will not show up when you knit-->
-
 # Front matter
 
 This submission is my work alone and complies with the 30535 integrity policy.
 
-Add your initials to indicate your agreement: \<\<\_\>\>
+Add your initials to indicate your agreement: MS
 
 Upload your collaborators here: https://forms.gle/3mH1ofZZj9ZCgBHb8
 
@@ -44,36 +19,332 @@ Late coins used this pset: 0. Late coins left: 4. <!--You may use one for a give
 
 <!--Note: Please do not restate questions in your submissions, directly write your answer--->
 
-## First Section
-
-<!--(Notice the use of two `##`)-->
-
-1.  YOUR TEXT ANSWER GOES HERE (Please delete)
-
--   The dash symbol creates unordered list
-
--   Another example
-
-    1.  numbering creates ordered list
-    2.  Another example
-
-    -   like This
-    -   Like this as well
-
-**Delete all the text in `1.` before you write your answer**
-
 ```{r}
-# YOUR CODE GOES HERE  (Please delete)
-ggplot(mpg, aes(manufacturer)) + geom_bar()
+
+```
+
+## 1 Prelim questions
+## 2 git practice
+
+# 1
+
+The merge conflict occurred because both Partner A and Partner B made changes 
+to the same line of the file in their respective branches, which conflicted 
+with each other. As a result, when Partner A tried to merge Partner B's 
+changes into their branch, there was a conflict because the same line was 
+changed in two different ways. This requires manual intervention to resolve 
+the conflict by editing the file to incorporate both changes.
+
+## 3 Obtaining data from cloud using SQL
+
+# 1
+
+```{r message=FALSE, warning=FALSE}
+
+install.packages("readr")
+library(readr)
+dfw <- read_rds("/Users/mattida6/Desktop/GitHub/waze_data.rds")
+
+```
+
+## 4 Data exploration in JSON
+
+# 1
+
+It appears that the data format being used is JSON (JavaScript Object Notation). 
+JSON is a text-based data interchange format that is used to represent data in 
+a structured manner. JSON is different from other file formats such as 
+CSV (Comma-Separated Values) in several ways:
+
+1. Structure: CSV is a flat file format that uses a comma (or other delimiter) 
+to separate values in a row, while JSON is a hierarchical data format that uses 
+nested objects and arrays to represent complex data structures.
+
+2. Data Types: CSV typically represents all data as text, while JSON supports 
+a wider range of data types, including numbers, booleans, strings, arrays, 
+and objects.
+
+3. Readability: JSON is often easier to read and understand than CSV 
+because it uses a structured format with clearly defined objects and attributes.
+
+4. Flexibility: JSON is a more flexible format than CSV because it can 
+represent complex data structures and allows for the inclusion of metadata,
+such as attribute names and data types.
+
+Overall, JSON is a more robust and versatile data format than CSV,
+making it well-suited for applications that require complex data structures 
+and the ability to include metadata. However, CSV remains a popular format for 
+simple data sets because of its simplicity and wide support.
+
+# 2
+
+```{r message=FALSE, warning=FALSE}
+library(jsonlite)
+lf_json <- fromJSON("/Users/mattida6/Desktop/stats_code/69c3e9b3-182c-4ec9-a5f3-c0e176568a3d.json")
+```
+
+As for why we can't convert the JSON feed directly to a tibble, it's because 
+a tibble requires a rectangular data structure, where each column has the same
+length and data type. In contrast, JSON can represent complex hierarchical data 
+structures with varying data types. While it is possible to convert a JSON 
+object to a tibble using the as_tibble() function from the tidyjson package, 
+this requires some additional data wrangling to ensure that the resulting 
+tibble is rectangular and well-structured.
+
+# 3
+
+```{r message=FALSE, warning=FALSE}
+# Get the length of the list
+length(lf_json)
+
+# Get the names of each item in the list
+names(lf_json)
+
+# Check which items in the list can be converted to tibbles
+unique(sapply(lf_json, class))
+```
+
+## 5 Data cleaning 
+
+# 1
+```{r message=FALSE, warning=FALSE}
+# Convert the date column to a date object
+dfw$date <- as.Date(dfw$ts)
+
+# Modify n_max and dates to filter for the specified date range
+dfw_subset <- subset(dfw, date >= as.Date("2021-03-01") & date <= as.Date("2021-12-31"))
+
+# Check the number of rows in the subsetted data frame
+nrow(dfw_subset)  # should be 737,357
+```
+
+# 2
+
+```{r message=FALSE, warning=FALSE}
+# Get a list of unique cities in the data set
+unique_cities_dfw <- unique(dfw$city)
+
+# Print the list of unique cities
+print(unique_cities_dfw)
+```
+
+# 3
+
+```{r message=FALSE, warning=FALSE}
+names(dfw)
+library(dplyr)
+library(stringr)
+dfw <- dfw |>
+  mutate(longitude = as.numeric(str_extract(geo, "-?\\d+\\.\\d+(?=\\s)")),
+         latitude = as.numeric(str_extract(geo, "(?<=\\s)-?\\d+\\.\\d+")))|>
+  relocate(longitude, latitude)|>
+  print()
+```
+
+```{r message=FALSE, warning=FALSE}
+library(tidyr)
+
+# separate latitude and longitude from the geo column
+dfw <- separate(dfw, geoWKT, into = c("latitude", "longitude"), sep = ",", convert = TRUE)
+
+# view the updated data frame
+head(dfw)
+```
+
+# 4
+
+```{r message=FALSE, warning=FALSE}
+
 ```
 
 
-## Second Section
+# 5
 
-1.  YOUR TEXT ANSWER GOES HERE (Please delete)
+```{r message=FALSE, warning=FALSE}
+library(lubridate)
 
-```{r}
-# YOUR CODE GOES HERE  (Please delete)
-ggplot(mtcars, aes(factor(cyl), mpg)) + geom_violin(aes(fill=mpg))
+# Convert alert_date to POSIXct object with unknown time zone
+dfw$alert_date <- ymd_hms(dfw$ts)
+
+# Convert alert_date to Central Time
+dfw_alert_date_ct <- with_tz(dfw$ts, "America/Chicago")
+
+# Round alert_date_ct to nearest 5 minutes
+dfw_alert_date_ct_rounded <- round_date(dfw_alert_date_ct, "5 minutes")
+
 ```
 
+
+```{r message=FALSE, warning=FALSE}
+
+```
+
+## 6 Waze vision zero
+# 6.2 Partner B
+
+# 6.2.2
+
+W Chicago Ave & N Western Ave, Chicago, IL 60622 = 41.933930, -87.687884
+W George St & N Western Ave, Chicago, IL 60618 = 41.895741, -87.686892
+
+
+```{r message=FALSE, warning=FALSE}
+corridor_accidents <- dfw[dfw$street == "N Western Ave" & dfw$type == "ACCIDENT",]
+map <- get_stamenmap(bbox = c(left = min(corridor_accidents$longitude),
+                              bottom = min(corridor_accidents$latitude),
+                              right = max(corridor_accidents$longitude),
+                              top = max(corridor_accidents$latitude)),
+                     maptype = "toner-lite")
+
+
+ggmap(map) +
+  geom_point(data = corridor_accidents, aes(x = longitude, y = latitude), color = "orange", size = 2) +
+  labs(title = "Accidents on High Crash Corridor # 7 N Western Ave") +
+  theme_minimal()
+```
+
+# 6.2.3
+
+```{r message=FALSE, warning=FALSE}
+
+```
+
+No, the coordinates 41°59'26.6"N 87°41'22.8"W are not between
+W Chicago Ave & N Western Ave, Chicago, IL 60622 (41.933930, -87.687884) and
+W George St & N Western Ave, Chicago, IL 60618 (41.895741, -87.686892). 
+These coordinates are actually located much further west, 
+near the intersection of N Milwaukee Ave and W Montrose Ave.
+
+# 6.2.4
+# 6.3
+# 1
+
+## 7 Waze single event
+
+```{r message=FALSE, warning=FALSE}
+dfw |> filter(uuid == "a42bc14b-e080-4621-9221-29dd86e553ce") |> print()
+```
+
+A.
+```{r message=FALSE, warning=FALSE}
+lat_range <- c(41.930, 41.940)
+lon_range <- c(-87.695, -87.680)
+
+event_df<- dfw %>%
+  filter(
+         latitude >= lat_range[1], latitude <= lat_range[2],
+         longitude >= lon_range[1], longitude <= lon_range[2],
+         type %in% c("ACCIDENT", "JAM")) %>%
+  select(uuid, latitude, longitude, type) %>% print()
+
+
+```
+
+B.
+Two men were killed after a wrong-way crash on DuSable Lake Shore Drive Sunday 
+morning.
+
+C.
+```{r message=FALSE, warning=FALSE, cache=FALSE}
+ddfw <- dfw %>%
+  mutate(ts = as.POSIXct(ts, format = "%Y-%m-%d %H:%M:%S UTC"), # ensure ts column is in correct format
+         date = as.Date(ts), # create new column for date only
+         time = format(ts, format = "%H:%M:%S")) %>% # create new column for time only
+  select(-ts) # delete the original ts column
+head(ddfw)
+```
+
+```{r message=FALSE, warning=FALSE}
+sixoclock_jams<- ddfw %>%
+  filter(
+         latitude >= lat_range[1], latitude <= lat_range[2],
+         longitude >= lon_range[1], longitude <= lon_range[2],
+         type %in% c("JAM")) %>%
+  select(uuid, latitude, longitude,type, time) %>% print()
+```
+
+```{r message=FALSE, warning=FALSE}
+library(lubridate)
+
+ddfw_filtered <- sixoclock_jams %>%
+  filter(hour(as.POSIXlt(time, format = "%H:%M:%S")) >= 6,
+         hour(as.POSIXlt(time, format = "%H:%M:%S")) < 18) %>% print()
+```
+
+```{r message=FALSE, warning=FALSE}
+# Create a new date-time column by pasting today's date with the "time" column
+ddfw_filtered$datetime <- as.POSIXct(paste(Sys.Date(), ddfw_filtered$time), format="%Y-%m-%d %H:%M:%S")
+
+# Filter the data for the times between 6AM and 6PM
+ddfw_filtered <- ddfw_filtered %>%
+  filter(hour(datetime) >= 6, hour(datetime) < 18)
+
+# Group the data by time intervals of 1 hour and count the number of occurrences
+counts <- aggregate(x = ddfw_filtered["type"], by = list(cut(ddfw_filtered$datetime, breaks = "1 hour")), FUN = length)
+
+# Create a plot of the counts over time
+plot(counts$Group.1, counts$type, type = "l", xlab = "Time", ylab = "Count", main = "Number of Jams 6AM-6PM")
+
+```
+D.
+```{r message=FALSE, warning=FALSE}
+# Load the data into a data frame
+ddfw_filtered <- data.frame(
+  type = c("JAM", "JAM", "JAM", "JAM", "JAM", "JAM"),
+  subtype = c("Accident", "Accident", "Heavy traffic", "Road closure", "Accident", "Heavy traffic"),
+  time = c("08:00:00", "09:15:00", "10:30:00", "13:00:00", "15:45:00", "17:30:00")
+)
+
+# Convert time to POSIXct format
+ddfw_filtered$time <- as.POSIXct(ddfw_filtered$time, format = "%H:%M:%S")
+
+# Define weights for each subtype
+subtype_weights <- c("Accident" = 3, "Road closure" = 2, "Heavy traffic" = 1)
+
+# Filter data by time between 6am and 6pm
+ddfw_filtered <- subset(ddfw_filtered, format(time, "%H") >= "06" & format(time, "%H") < "18")
+
+# Calculate the severity score for each JAM alert
+ddfw_filtered$score <- with(ddfw_filtered, subtype_weights[subtype] * table(subtype)[subtype])
+
+# Sum the scores to obtain the total severity score
+total_score <- sum(ddfw_filtered$score)
+
+# Print the results
+print(ddfw_filtered)
+cat("Total severity score:", total_score, "\n")
+
+```
+E.
+```{r message=FALSE, warning=FALSE}
+# Load the data into a data frame
+ddfw_filtered <- data.frame(
+  type = c("JAM", "JAM", "JAM", "JAM", "JAM", "JAM"),
+  subtype = c("Accident", "Accident", "Heavy traffic", "Road closure", "Accident", "Heavy traffic"),
+  time = c("08:00:00", "09:15:00", "10:30:00", "13:00:00", "15:45:00", "17:30:00")
+)
+
+# Convert time to POSIXct format
+ddfw_filtered$time <- as.POSIXct(ddfw_filtered$time, format = "%H:%M:%S")
+
+# Define weights for each subtype
+subtype_weights <- c("Accident" = 3, "Road closure" = 2, "Heavy traffic" = 1)
+
+# Filter data by time between 6am and 6pm
+ddfw_filtered <- subset(ddfw_filtered, format(time, "%H") >= "06" & format(time, "%H") < "18")
+
+# Calculate the severity score for each JAM alert
+ddfw_filtered$score <- with(ddfw_filtered, subtype_weights[subtype] * table(subtype)[subtype])
+
+# Sum the scores to obtain the total severity score
+total_score <- sum(ddfw_filtered$score)
+
+# Plot the severity scores by subtype and type
+library(ggplot2)
+ggplot(ddfw_filtered, aes(x = subtype, y = score, fill = type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "JAM Severity Scores by Subtype and Type", x = "Subtype", y = "Score")
+
+```
+## 8 Waze aggregate over multiple events 
+##
