@@ -188,23 +188,51 @@ W George St & N Western Ave, Chicago, IL 60618 = 41.895741, -87.686892
 
 
 ```{r message=FALSE, warning=FALSE}
-install.packages("ggmap")
-library(ggmap)
+
 ```
 
 ```{r message=FALSE, warning=FALSE}
+library(ggmap)
+
+# subset data for N Western Ave accidents
 corridor_accidents <- dfw[dfw$street == "N Western Ave" & dfw$type == "ACCIDENT",]
-map <- get_stamenmap(bbox = c(left = min(corridor_accidents$longitude),
-                              bottom = min(corridor_accidents$latitude),
-                              right = max(corridor_accidents$longitude),
-                              top = max(corridor_accidents$latitude)),
-                     maptype = "toner-lite")
 
+# get map centered on the accidents
+map <- get_stamenmap(
+  bbox = c(
+    left = min(corridor_accidents$longitude),
+    bottom = min(corridor_accidents$latitude),
+    right = max(corridor_accidents$longitude),
+    top = max(corridor_accidents$latitude)
+  ),
+  maptype = "toner-lite"
+)
 
+# plot the map and accidents
 ggmap(map) +
-  geom_point(data = corridor_accidents, aes(x = longitude, y = latitude), color = "orange", size = 2) +
-  labs(title = "Accidents on High Crash Corridor # 7 N Western Ave") +
-  theme_minimal()
+  geom_point(
+    data = corridor_accidents,
+    aes(x = longitude, y = latitude),
+    color = "orange",
+    size = 2,
+    alpha = 0.6,
+    shape = 21,
+    fill = "white",
+    stroke = 0.5
+  ) +
+  labs(
+    title = "Accidents on High Crash Corridor # 7",
+    subtitle = "N Western Ave",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = rel(1.5), face = "bold", hjust = 0.5),
+    plot.subtitle = element_text(size = rel(1.2), face = "bold", hjust = 0.5)
+  )
+
+
 ```
 
 # 6.2.3
