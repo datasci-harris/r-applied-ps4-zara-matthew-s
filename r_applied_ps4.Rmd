@@ -39,7 +39,7 @@ dfw<- read_rds("waze_data(1).rds")
 
 ```
 
-## Prelim Question 
+## 1 Prelim Question 
 1.1 Yes, waze data set has been deleted from my computer 
 
 1.2  One additional variable that Waze could track, which is not available 
