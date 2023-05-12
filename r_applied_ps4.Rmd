@@ -1,18 +1,21 @@
 ---
 title: "applied_PS4"
-author: "Zara"
+author: "Zara & Matthew"
 date: "13th May 2023"
 output: pdf_document
 ---
+<<<<<<< HEAD
+=======
 <!-- .Rmd files use  markdown, a text mark up language, to provide formating.-->
 
 <!--Text include within these strange arrows are comments and will not show up when you knit-->
+
 
 # Front matter
 
 This submission is my work alone and complies with the 30535 integrity policy.
 
-Add your initials to indicate your agreement: Z.N
+Add your initials to indicate your agreement: M.S & Z.N
 
 Upload your collaborators here: https://forms.gle/3mH1ofZZj9ZCgBHb8
 
@@ -34,12 +37,11 @@ library(lubridate)
 rm(list=ls())
 install.packages("readr")
 
-library(readr)
-dfw<- read_rds("waze_data(1).rds")
-
 ```
 
+
 ## 1 Prelim Question 
+
 1.1 Yes, waze data set has been deleted from my computer 
 
 1.2  One additional variable that Waze could track, which is not available 
@@ -49,12 +51,14 @@ planning, and enhancing the overall user experience. Waze could partner with
 weather data providers, enable user reporting, or integrate weather sensors to 
 gather accurate and timely weather information.
 
-The variable "nThumbsUp" could potentially be tracked and utilized better by Waze. Currently, Waze allows users to give thumbs-up ratings to reports, but the 
-specific count of thumbs-up is not always visible or utilized prominently in the application. Enhancing the tracking and visibility of the "nThumbsUp" variable 
-would provide valuable information about the credibility and reliability of 
-user-generated reports. It could help prioritize and validate reports based on 
-user feedback, ensuring more accurate and reliable information for other Waze 
-users.
+The variable "nThumbsUp" could potentially be tracked and utilized better by
+Waze. Currently, Waze allows users to give thumbs-up ratings to reports, but the 
+specific count of thumbs-up is not always visible or utilized prominently 
+in the application. Enhancing the tracking and visibility of the "nThumbsUp" 
+variable would provide valuable information about the credibility and 
+reliability of user-generated reports. It could help prioritize and validate 
+reports based on user feedback, ensuring more accurate and reliable information
+for other Waze users.
 
 1.3 
 Self-selection among Waze users influences the data present on the platform.
@@ -64,7 +68,88 @@ less popular features and rural areas may have limited data due to user
 preferences and geographic concentration. Understanding these biases is crucial 
 for using Waze data effectively.
 
+## 2 git practice
+
+# 1
+
+The merge conflict occurred because both Partner A and Partner B made changes 
+to the same line of the file in their respective branches, which conflicted 
+with each other. As a result, when Partner A tried to merge Partner B's 
+changes into their branch, there was a conflict because the same line was 
+changed in two different ways. This requires manual intervention to resolve 
+the conflict by editing the file to incorporate both changes.
+
+## 3 Obtaining data from cloud using SQL
+
+# 1
+
+```{r message=FALSE, warning=FALSE}
+
+install.packages("readr")
+library(readr)
+dfw <- read_rds("/Users/mattida6/Desktop/GitHub/waze_data.rds")
+
+```
+
+## 4 Data exploration in JSON
+
+# 1
+
+It appears that the data format being used is JSON (JavaScript Object Notation). 
+JSON is a text-based data interchange format that is used to represent data in 
+a structured manner. JSON is different from other file formats such as 
+CSV (Comma-Separated Values) in several ways:
+
+1. Structure: CSV is a flat file format that uses a comma (or other delimiter) 
+to separate values in a row, while JSON is a hierarchical data format that uses 
+nested objects and arrays to represent complex data structures.
+
+2. Data Types: CSV typically represents all data as text, while JSON supports 
+a wider range of data types, including numbers, booleans, strings, arrays, 
+and objects.
+
+3. Readability: JSON is often easier to read and understand than CSV 
+because it uses a structured format with clearly defined objects and attributes.
+
+4. Flexibility: JSON is a more flexible format than CSV because it can 
+represent complex data structures and allows for the inclusion of metadata,
+such as attribute names and data types.
+
+Overall, JSON is a more robust and versatile data format than CSV,
+making it well-suited for applications that require complex data structures 
+and the ability to include metadata. However, CSV remains a popular format for 
+simple data sets because of its simplicity and wide support.
+
+# 2
+
+```{r message=FALSE, warning=FALSE}
+library(jsonlite)
+lf_json <- fromJSON("/Users/mattida6/Desktop/stats_code/69c3e9b3-182c-4ec9-a5f3-c0e176568a3d.json")
+```
+
+As for why we can't convert the JSON feed directly to a tibble, it's because 
+a tibble requires a rectangular data structure, where each column has the same
+length and data type. In contrast, JSON can represent complex hierarchical data 
+structures with varying data types. While it is possible to convert a JSON 
+object to a tibble using the as_tibble() function from the tidyjson package, 
+this requires some additional data wrangling to ensure that the resulting 
+tibble is rectangular and well-structured.
+
+# 3
+
+```{r message=FALSE, warning=FALSE}
+# Get the length of the list
+length(lf_json)
+
+# Get the names of each item in the list
+names(lf_json)
+
+# Check which items in the list can be converted to tibbles
+unique(sapply(lf_json, class))
+```
+
 ## 5 Data Cleaning 
+
 5.1 Data downloaded from convas in the form of an rds file. computed a test_that 
 that the dataset has 737,357 rows test passed. 
 ```{r}
@@ -112,8 +197,10 @@ ggplot(dfw, aes(x = hour, fill = type)) +
 
 ```
 
-5.5 By default the alerts are in central time zones. Column with alerts recorded to central time and a
-second column with alerts on central time rounded to thenearest 5 minutes added. 
+5.5 By default the alerts are in central time zones. Column with alerts 
+recorded to central time and a second column with alerts on central time 
+rounded to thenearest 5 minutes added. 
+
 ```{r}
 dfw <- dfw |>
   mutate(
@@ -125,6 +212,7 @@ dfw <- dfw |>
 
 ```
 
+## 6 Waze vision zero
 ## 6 Waze Vision Zero
 
 Partner A 
@@ -164,6 +252,7 @@ ggmap(map) +
 
 6.1.3 Around this "41.78876_-87.586654" interaction accidents are most common, 
 this is near the 59th street, which is not within the boxed parameter 
+
 ```{r}
 
 
@@ -178,16 +267,195 @@ bbox_top <- 41.7949
 
 
 corridor_accidents_bbox <- corridor_accidents |>
-  filter(street == "S Stony Island Ave" & longitude >= bbox_left & longitude <= bbox_right & latitude >= bbox_bottom & latitude <= bbox_top)
+  filter(street == "S Stony Island Ave" & 
+           longitude >= bbox_left & longitude <= bbox_right & 
+           latitude >= bbox_bottom & latitude <= bbox_top)
 
 # Grouping accidents by intersection and counting occurrences
 intersection_counts <- count(corridor_accidents_bbox, latitude, longitude)
 
 # Retrieving intersection with the highest number of accidents
-most_common_intersection <- with(intersection_counts, paste(latitude[which.max(n)], longitude[which.max(n)], sep = " "))
+most_common_intersection <- with(intersection_counts, paste(
+  latitude[which.max(n)], longitude[which.max(n)], sep = " "))
 
 most_common_intersection
+```
 
+# 6.2 Partner B
+
+# 6.2.2
+
+W Chicago Ave & N Western Ave, Chicago, IL 60622 = 41.933930, -87.687884
+W George St & N Western Ave, Chicago, IL 60618 = 41.895741, -87.686892
+
+
+```{r message=FALSE, warning=FALSE}
+install.packages("ggmap")
+library(ggmap)
+
+
+```
+
+```{r message=FALSE, warning=FALSE}
+library(ggmap)
+install.packages("ggspatial")
+library(ggspatial)
+
+corridor_accidents <- dfw[dfw$street == "N Western Ave" & dfw$type == "ACCIDENT",]
+map <- get_stamenmap(bbox = c(left = min(corridor_accidents$longitude),
+                              bottom = min(corridor_accidents$latitude),
+                              right = max(corridor_accidents$longitude),
+                              top = max(corridor_accidents$latitude)),
+                     maptype = "toner-lite")
+
+ggmap(map) +
+  geom_point(data = corridor_accidents, aes(x = longitude, y = latitude), color = "orange", size = 3) +
+  labs(title = "Accidents on High Crash Corridor #: N Western Ave",
+       x = "Longitude", y = "Latitude") +
+  theme_minimal() +
+  annotation_scale(location = "bl", width_hint = 0.3, text_cex = 0.8, bar_step = 0.25) +
+  guides(color = FALSE, size = guide_legend(title = "Accidents"))
+
+```
+
+# 6.2.3
+
+No, the coordinates 41°59'26.6"N 87°41'22.8"W are not between
+W Chicago Ave & N Western Ave, Chicago, IL 60622 (41.933930, -87.687884) and
+W George St & N Western Ave, Chicago, IL 60618 (41.895741, -87.686892). 
+These coordinates are actually located much further west, 
+near the intersection of N Milwaukee Ave and W Montrose Ave.
+
+
+# 6.3
+# 1
+success
+
+## 7 Waze single event
+# 1
+```{r message=FALSE, warning=FALSE}
+dfw |> filter(uuid == "a42bc14b-e080-4621-9221-29dd86e553ce") |> print()
+```
+
+A.
+```{r message=FALSE, warning=FALSE}
+lat_range <- c(41.930, 41.940)
+lon_range <- c(-87.695, -87.680)
+
+event_df<- dfw %>%
+  filter(
+         latitude >= lat_range[1], latitude <= lat_range[2],
+         longitude >= lon_range[1], longitude <= lon_range[2],
+         type %in% c("ACCIDENT", "JAM")) %>%
+  select(uuid, latitude, longitude, type) %>% print()
+
+
+```
+
+B.
+Two men were killed after a wrong-way crash on DuSable Lake Shore Drive Sunday 
+morning.
+
+C.
+```{r message=FALSE, warning=FALSE, cache=FALSE}
+ddfw <- dfw %>%
+  mutate(ts = as.POSIXct(ts, format = "%Y-%m-%d %H:%M:%S UTC"), # ensure ts column is in correct format
+         date = as.Date(ts), # create new column for date only
+         time = format(ts, format = "%H:%M:%S")) %>% # create new column for time only
+  select(-ts) # delete the original ts column
+head(ddfw)
+```
+
+```{r message=FALSE, warning=FALSE}
+sixoclock_jams<- ddfw %>%
+  filter(
+         latitude >= lat_range[1], latitude <= lat_range[2],
+         longitude >= lon_range[1], longitude <= lon_range[2],
+         type %in% c("JAM")) %>%
+  select(uuid, latitude, longitude,type, time) %>% print()
+```
+
+```{r message=FALSE, warning=FALSE}
+library(lubridate)
+
+ddfw_filtered <- sixoclock_jams %>%
+  filter(hour(as.POSIXlt(time, format = "%H:%M:%S")) >= 6,
+         hour(as.POSIXlt(time, format = "%H:%M:%S")) < 18) %>% print()
+```
+
+```{r message=FALSE, warning=FALSE}
+# Create a new date-time column by pasting today's date with the "time" column
+ddfw_filtered$datetime <- as.POSIXct(paste(Sys.Date(), ddfw_filtered$time), format="%Y-%m-%d %H:%M:%S")
+
+# Filter the data for the times between 6AM and 6PM
+ddfw_filtered <- ddfw_filtered %>%
+  filter(hour(datetime) >= 6, hour(datetime) < 18)
+
+# Group the data by time intervals of 1 hour and count the number of occurrences
+counts <- aggregate(x = ddfw_filtered["type"], by = list(cut(ddfw_filtered$datetime, breaks = "1 hour")), FUN = length)
+
+# Create a plot of the counts over time
+plot(counts$Group.1, counts$type, type = "l", xlab = "Time", ylab = "Count", main = "Number of Jams 6AM-6PM")
+
+```
+D.
+```{r message=FALSE, warning=FALSE}
+# Load the data into a data frame
+ddfw_filtered <- data.frame(
+  type = c("JAM", "JAM", "JAM", "JAM", "JAM", "JAM"),
+  subtype = c("Accident", "Accident", "Heavy traffic", "Road closure", "Accident", "Heavy traffic"),
+  time = c("08:00:00", "09:15:00", "10:30:00", "13:00:00", "15:45:00", "17:30:00")
+)
+
+# Convert time to POSIXct format
+ddfw_filtered$time <- as.POSIXct(ddfw_filtered$time, format = "%H:%M:%S")
+
+# Define weights for each subtype
+subtype_weights <- c("Accident" = 3, "Road closure" = 2, "Heavy traffic" = 1)
+
+# Filter data by time between 6am and 6pm
+ddfw_filtered <- subset(ddfw_filtered, format(time, "%H") >= "06" & format(time, "%H") < "18")
+
+# Calculate the severity score for each JAM alert
+ddfw_filtered$score <- with(ddfw_filtered, subtype_weights[subtype] * table(subtype)[subtype])
+
+# Sum the scores to obtain the total severity score
+total_score <- sum(ddfw_filtered$score)
+
+# Print the results
+print(ddfw_filtered)
+cat("Total severity score:", total_score, "\n")
+
+```
+E.
+```{r message=FALSE, warning=FALSE}
+# Load the data into a data frame
+ddfw_filtered <- data.frame(
+  type = c("JAM", "JAM", "JAM", "JAM", "JAM", "JAM"),
+  subtype = c("Accident", "Accident", "Heavy traffic", "Road closure", "Accident", "Heavy traffic"),
+  time = c("08:00:00", "09:15:00", "10:30:00", "13:00:00", "15:45:00", "17:30:00")
+)
+
+# Convert time to POSIXct format
+ddfw_filtered$time <- as.POSIXct(ddfw_filtered$time, format = "%H:%M:%S")
+
+# Define weights for each subtype
+subtype_weights <- c("Accident" = 3, "Road closure" = 2, "Heavy traffic" = 1)
+
+# Filter data by time between 6am and 6pm
+ddfw_filtered <- subset(ddfw_filtered, format(time, "%H") >= "06" & format(time, "%H") < "18")
+
+# Calculate the severity score for each JAM alert
+ddfw_filtered$score <- with(ddfw_filtered, subtype_weights[subtype] * table(subtype)[subtype])
+
+# Sum the scores to obtain the total severity score
+total_score <- sum(ddfw_filtered$score)
+
+# Plot the severity scores by subtype and type
+library(ggplot2)
+ggplot(ddfw_filtered, aes(x = subtype, y = score, fill = type)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "JAM Severity Scores by Subtype and Type", x = "Subtype", y = "Score")
 
 ```
 
@@ -285,5 +553,4 @@ result <- get_alerts_within_buffer(dfw, uuid, buffer_distance)
 print(result)
 
 ```
-
 
