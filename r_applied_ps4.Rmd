@@ -39,6 +39,30 @@ dfw<- read_rds("waze_data(1).rds")
 
 ```
 
+## Prelim Question 
+1.1 Yes, waze data set has been deleted from my computer 
+
+1.2  One additional variable that Waze could track, which is not available 
+currently, is "Weather Conditions." This would provide real-time information on 
+weather conditions along routes, enhancing user safety, improving route 
+planning, and enhancing the overall user experience. Waze could partner with 
+weather data providers, enable user reporting, or integrate weather sensors to 
+gather accurate and timely weather information.
+
+The variable "nThumbsUp" could potentially be tracked and utilized better by Waze. Currently, Waze allows users to give thumbs-up ratings to reports, but the 
+specific count of thumbs-up is not always visible or utilized prominently in the application. Enhancing the tracking and visibility of the "nThumbsUp" variable 
+would provide valuable information about the credibility and reliability of 
+user-generated reports. It could help prioritize and validate reports based on 
+user feedback, ensuring more accurate and reliable information for other Waze 
+users.
+
+1.3 
+Self-selection among Waze users influences the data present on the platform.
+Users who actively engage with the app are more likely to contribute 
+traffic-related information, leading to a higher density of such data. However, 
+less popular features and rural areas may have limited data due to user 
+preferences and geographic concentration. Understanding these biases is crucial 
+for using Waze data effectively.
 
 ## 5 Data Cleaning 
 5.1 Data downloaded from convas in the form of an rds file. computed a test_that that the dataset has 737,357 rows test passed. 
