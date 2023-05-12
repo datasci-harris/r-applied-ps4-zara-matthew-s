@@ -104,70 +104,6 @@ names(lf_json)
 unique(sapply(lf_json, class))
 ```
 
-## 5 Data cleaning 
-
-# 1
-```{r message=FALSE, warning=FALSE}
-# Convert the date column to a date object
-dfw$date <- as.Date(dfw$ts)
-
-# Modify n_max and dates to filter for the specified date range
-dfw_subset <- subset(dfw, date >= as.Date("2021-03-01") & date <= as.Date("2021-12-31"))
-
-# Check the number of rows in the subsetted data frame
-nrow(dfw_subset)  # should be 737,357
-```
-
-# 2
-
-```{r message=FALSE, warning=FALSE}
-# Get a list of unique cities in the data set
-unique_cities_dfw <- unique(dfw$city)
-
-# Print the list of unique cities
-print(unique_cities_dfw)
-```
-
-# 3
-
-```{r message=FALSE, warning=FALSE}
-names(dfw)
-library(dplyr)
-library(stringr)
-dfw <- dfw |>
-  mutate(longitude = as.numeric(str_extract(geo, "-?\\d+\\.\\d+(?=\\s)")),
-         latitude = as.numeric(str_extract(geo, "(?<=\\s)-?\\d+\\.\\d+")))|>
-  relocate(longitude, latitude)|>
-  print()
-```
-
-```{r message=FALSE, warning=FALSE}
-library(tidyr)
-
-# separate latitude and longitude from the geo column
-dfw <- separate(dfw, geoWKT, into = c("latitude", "longitude"), sep = ",", convert = TRUE)
-
-# view the updated data frame
-head(dfw)
-```
-
-# 4
-
-```{r message=FALSE, warning=FALSE}
-
-```
-
-
-# 5
-
-```{r message=FALSE, warning=FALSE}
-
-```
-
-
-```{r message=FALSE, warning=FALSE}
-
-```
 
 ## 6 Waze vision zero
 # 6.2 Partner B
@@ -179,50 +115,31 @@ W George St & N Western Ave, Chicago, IL 60618 = 41.895741, -87.686892
 
 
 ```{r message=FALSE, warning=FALSE}
+install.packages("ggmap")
+library(ggmap)
+
 
 ```
 
 ```{r message=FALSE, warning=FALSE}
 library(ggmap)
+install.packages("ggspatial")
+library(ggspatial)
 
-# subset data for N Western Ave accidents
 corridor_accidents <- dfw[dfw$street == "N Western Ave" & dfw$type == "ACCIDENT",]
+map <- get_stamenmap(bbox = c(left = min(corridor_accidents$longitude),
+                              bottom = min(corridor_accidents$latitude),
+                              right = max(corridor_accidents$longitude),
+                              top = max(corridor_accidents$latitude)),
+                     maptype = "toner-lite")
 
-# get map centered on the accidents
-map <- get_stamenmap(
-  bbox = c(
-    left = min(corridor_accidents$longitude),
-    bottom = min(corridor_accidents$latitude),
-    right = max(corridor_accidents$longitude),
-    top = max(corridor_accidents$latitude)
-  ),
-  maptype = "toner-lite"
-)
-
-# plot the map and accidents
 ggmap(map) +
-  geom_point(
-    data = corridor_accidents,
-    aes(x = longitude, y = latitude),
-    color = "orange",
-    size = 2,
-    alpha = 0.6,
-    shape = 21,
-    fill = "white",
-    stroke = 0.5
-  ) +
-  labs(
-    title = "Accidents on High Crash Corridor # 7",
-    subtitle = "N Western Ave",
-    x = "Longitude",
-    y = "Latitude"
-  ) +
+  geom_point(data = corridor_accidents, aes(x = longitude, y = latitude), color = "orange", size = 3) +
+  labs(title = "Accidents on High Crash Corridor #: N Western Ave",
+       x = "Longitude", y = "Latitude") +
   theme_minimal() +
-  theme(
-    plot.title = element_text(size = rel(1.5), face = "bold", hjust = 0.5),
-    plot.subtitle = element_text(size = rel(1.2), face = "bold", hjust = 0.5)
-  )
-
+  annotation_scale(location = "bl", width_hint = 0.3, text_cex = 0.8, bar_step = 0.25) +
+  guides(color = FALSE, size = guide_legend(title = "Accidents"))
 
 ```
 
@@ -366,35 +283,5 @@ ggplot(ddfw_filtered, aes(x = subtype, y = score, fill = type)) +
   labs(title = "JAM Severity Scores by Subtype and Type", x = "Subtype", y = "Score")
 
 ```
-=======
-# 2
-
-W Chicago Ave & N Western Ave, Chicago, IL 60622 = 41.933930, -87.687884
-W George St & N Western Ave, Chicago, IL 60618 = 41.895741, -87.686892
-```{r message=FALSE, warning=FALSE}
-unique_values <- unique(dfw$street)
-unique_values
-```
-
-```{r message=FALSE, warning=FALSE}
-
-install.packages("ggmap")
-library(ggmap)
-```
-
-```{r message=FALSE, warning=FALSE}
-corridor_accidents <- dfw[dfw$street == "N Western Ave" & dfw$type == "ACCIDENT",]
-map <- get_stamenmap(bbox = c(left = min(corridor_accidents$longitude),
-                              bottom = min(corridor_accidents$latitude),
-                              right = max(corridor_accidents$longitude),
-                              top = max(corridor_accidents$latitude)),
-                     maptype = "toner-lite")
-
-
-ggmap(map) +
-  geom_point(data = corridor_accidents, aes(x = longitude, y = latitude), color = "orange", size = 2) +
-  labs(title = "Accidents on High Crash Corridor # 7 N Western Ave") +
-  theme_minimal()
-```
-
-## 7 Waze single event
+## 8 Waze aggregate over multiple events 
+##
