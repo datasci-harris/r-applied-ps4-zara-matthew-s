@@ -171,7 +171,6 @@ dfw_alert_date_ct <- with_tz(dfw$ts, "America/Chicago")
 
 # Round alert_date_ct to nearest 5 minutes
 dfw_alert_date_ct_rounded <- round_date(dfw_alert_date_ct, "5 minutes")
-
 ```
 
 
@@ -187,6 +186,11 @@ dfw_alert_date_ct_rounded <- round_date(dfw_alert_date_ct, "5 minutes")
 W Chicago Ave & N Western Ave, Chicago, IL 60622 = 41.933930, -87.687884
 W George St & N Western Ave, Chicago, IL 60618 = 41.895741, -87.686892
 
+
+```{r message=FALSE, warning=FALSE}
+install.packages("ggmap")
+library(ggmap)
+```
 
 ```{r message=FALSE, warning=FALSE}
 corridor_accidents <- dfw[dfw$street == "N Western Ave" & dfw$type == "ACCIDENT",]
@@ -205,22 +209,19 @@ ggmap(map) +
 
 # 6.2.3
 
-```{r message=FALSE, warning=FALSE}
-
-```
-
 No, the coordinates 41°59'26.6"N 87°41'22.8"W are not between
 W Chicago Ave & N Western Ave, Chicago, IL 60622 (41.933930, -87.687884) and
 W George St & N Western Ave, Chicago, IL 60618 (41.895741, -87.686892). 
 These coordinates are actually located much further west, 
 near the intersection of N Milwaukee Ave and W Montrose Ave.
 
-# 6.2.4
+
 # 6.3
 # 1
+success
 
 ## 7 Waze single event
-
+# 1
 ```{r message=FALSE, warning=FALSE}
 dfw |> filter(uuid == "a42bc14b-e080-4621-9221-29dd86e553ce") |> print()
 ```
