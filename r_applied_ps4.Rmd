@@ -1,31 +1,9 @@
 ---
 title: "applied_PS4"
-author: "Matthew S."
+author: "Zara"
 date: "13th May 2023"
 output: pdf_document
 ---
-
-```{r message=FALSE, warning=FALSE}
-rm(list=ls())
-
-install.packages("bigrquery")
-library(bigrquery)
-library(tidyverse)
-
-billing_and_proj_id <- "ganong-teaching-343718"
-
-sql <- "SELECT
-  *
-FROM `waze-public-dataset.partner_UniversityofChicago.view_alerts_clustered`
-WHERE city = 'Chicago, IL' AND date(ts) = '2023-02-01'"
-
-tbl_waze <- bq_project_query(billing_and_proj_id, sql)
-
-system.time(all_alerts <- bq_table_download(tbl_waze, n_max = 10))
-
-
-```
-
 <!-- .Rmd files use  markdown, a text mark up language, to provide formating.-->
 
 <!--Text include within these strange arrows are comments and will not show up when you knit-->
@@ -34,46 +12,250 @@ system.time(all_alerts <- bq_table_download(tbl_waze, n_max = 10))
 
 This submission is my work alone and complies with the 30535 integrity policy.
 
-Add your initials to indicate your agreement: \<\<\_\>\>
+Add your initials to indicate your agreement: Z.N
 
 Upload your collaborators here: https://forms.gle/3mH1ofZZj9ZCgBHb8
 
 Late coins used this pset: 0. Late coins left: 4. <!--You may use one for a given assignment.-->
 
-# R for Data Science Exercises
 
-<!--Note: Please do not restate questions in your submissions, directly write your answer--->
+```{r message=FALSE, warning=FALSE}
+rm(list=ls())
+install.packages("anytime")
+install.packages("bigrquery")
+install.packages("stringr")
+install.packages("ggmap")
+library(bigrquery)
+library(tidyverse)
+library(testthat)
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+rm(list=ls())
+install.packages("readr")
 
-## First Section
+library(readr)
+dfw<- read_rds("waze_data(1).rds")
 
-<!--(Notice the use of two `##`)-->
-
-1.  YOUR TEXT ANSWER GOES HERE (Please delete)
-
--   The dash symbol creates unordered list
-
--   Another example
-
-    1.  numbering creates ordered list
-    2.  Another example
-
-    -   like This
-    -   Like this as well
-
-**Delete all the text in `1.` before you write your answer**
-
-```{r}
-# YOUR CODE GOES HERE  (Please delete)
-ggplot(mpg, aes(manufacturer)) + geom_bar()
 ```
 
 
-## Second Section
+## 5 Data Cleaning 
+5.1 Data downloaded from convas in the form of an rds file. computed a test_that that the dataset has 737,357 rows test passed. 
+```{r}
+test_that(
+  "we have the right number of row",
+  expect_equal(nrow(dfw),737357))
 
-1.  YOUR TEXT ANSWER GOES HERE (Please delete)
+```
+5.2 The data covers the city of chicago 
+```{r}
+
+city_number<-dfw|>
+  distinct(city)|>
+  print()
+```
+5.3 Separate columns for longitude and latitude created. 
+```{r}
+dfw <- dfw |>
+  mutate(longitude = as.numeric(str_extract(geo, "-?\\d+\\.\\d+(?=\\s)")),
+         latitude = as.numeric(str_extract(geo, "(?<=\\s)-?\\d+\\.\\d+")))|>
+  relocate(longitude, latitude)|>
+  print()
+
+
+
+```
+5.4 Alerts are most common at night post from 20:00 hours to 22:00 hours.
 
 ```{r}
-# YOUR CODE GOES HERE  (Please delete)
-ggplot(mtcars, aes(factor(cyl), mpg)) + geom_violin(aes(fill=mpg))
+
+library(ggplot2)
+library(dplyr)
+library(lubridate)
+
+dfw <- dfw |>
+  mutate(hour = hour(ymd_hms(ts)))
+
+ggplot(dfw, aes(x = hour, fill = type)) +
+  geom_bar() +
+  labs(x = "Hour of Day", y = "Number of Alerts", fill = "Alert Type") +
+  ggtitle("Number of Alerts by Hour of Day") +
+  theme_minimal()+ 
+  scale_x_continuous(breaks = seq(0, 23, by = 1))+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 ```
+
+5.5 By default the alerts are in central time zones. Column with alerts recorded to central time and a
+second column with alerts on central time rounded to thenearest 5 minutes added. 
+```{r}
+dfw <- dfw |>
+  mutate(
+    ts = as.POSIXct(ts, format = "%Y-%m-%d %H:%M:%S", tz = "UTC"),
+    ts_ct = with_tz(ts, "America/Chicago"),
+    ts_ct_rounded = round_date(ts_ct, "5 minutes")
+  )
+
+
+```
+
+## 6 Waze Vision Zero
+
+Partner A 
+
+6.1.1 branch called stony island created. 
+
+
+6.1.2 
+
+```{r}
+
+library(ggmap)
+
+unique_values <- unique(dfw$street)
+unique_values 
+
+corridor_accidents <- dfw[dfw$street == "S Stony Island Ave" & dfw$type == "ACCIDENT", ]
+
+map <- get_stamenmap(
+  bbox = c(
+    left = min(corridor_accidents$longitude, na.rm = TRUE),
+    bottom = min(corridor_accidents$latitude, na.rm = TRUE),
+    right = max(corridor_accidents$longitude, na.rm = TRUE),
+    top = max(corridor_accidents$latitude, na.rm = TRUE)
+  ),
+  maptype = "toner-lite",
+  zoom = 10
+)
+
+
+ggmap(map) +
+  geom_point(data = corridor_accidents, aes(x = longitude, y = latitude), color = "orange", size = 2) +
+  labs(title = "Accidents on High Crash Corridor # 25 S Stony Island Ave") +
+  theme_minimal()
+
+```
+
+6.1.3 Around this "41.78876_-87.586654" interaction accidents are most common, this is near the 59th street, which is not within the boxed parameter 
+```{r}
+
+
+library(ggmap)
+library(dplyr)
+
+# Defining the bounding box 
+bbox_left <- -87.5876
+bbox_bottom <- 41.7799
+bbox_right <- -87.5833
+bbox_top <- 41.7949
+
+
+corridor_accidents_bbox <- corridor_accidents |>
+  filter(street == "S Stony Island Ave" & longitude >= bbox_left & longitude <= bbox_right & latitude >= bbox_bottom & latitude <= bbox_top)
+
+# Grouping accidents by intersection and counting occurrences
+intersection_counts <- count(corridor_accidents_bbox, latitude, longitude)
+
+# Retrieving intersection with the highest number of accidents
+most_common_intersection <- with(intersection_counts, paste(latitude[which.max(n)], longitude[which.max(n)], sep = " "))
+
+most_common_intersection
+
+
+```
+
+## Waze aggregate over multiple events (20 points)
+8.1 uuid for one major accident is "68b55df9-30f0-4a7e-9556-7f11f366549b"
+```{r}
+
+selected_accident <- dfw |>
+  filter(type == "ACCIDENT", subtype == "ACCIDENT_MAJOR", uuid == "68b55df9-30f0-4a7e-9556-7f11f366549b")
+
+# Longitude and latitude of accident location
+accident_longitude <- selected_accident$longitude
+accident_latitude <- selected_accident$latitude
+
+# Defining the geographic box around the accident location with a 1000 meter radius
+box_radius <- 1000
+
+# Defining time range (one hour before and one hour after the accident)
+accident_time <- selected_accident$ts_ct_rounded
+time_range_start <- accident_time - lubridate::hours(1)
+time_range_end <- accident_time + lubridate::hours(1)
+
+# Filtering by time range and geographic box
+sample_alerts <- dfw |>
+  filter(
+    ts_ct_rounded >= time_range_start & ts_ct_rounded <= time_range_end,
+    geosphere::distVincentySphere(
+      cbind(longitude, latitude),
+      c(accident_longitude, accident_latitude)
+    ) * 6371000 <= box_radius
+  )
+
+# Getting UUIDs of the sample alerts
+sample_uuids <- sample_alerts$uuid
+
+# Print the UUID of the selected accident and the sample UUIDs of alerts
+print(sample_uuids)
+
+# Filter the alert based on the time range and alert type
+traffic_jam_alerts <- dfw |>
+  filter(ts_ct_rounded >= time_range_start, 
+         ts_ct_rounded <= time_range_end, type == "JAM")
+
+# Create a five-minute interval variable
+traffic_jam_alerts <- traffic_jam_alerts |>
+  mutate(interval = cut(ts_ct_rounded, breaks = "5 min"))
+
+# Counting the number of traffic jam alerts in each interval
+alert_counts <- traffic_jam_alerts |>
+  count(interval)
+
+# Plotting the number of traffic jam alerts over time
+ggplot(alert_counts, aes(x = interval, y = n)) +
+  geom_point() +
+  geom_line() +
+  labs(x = "Time Interval", y = "Number of Traffic Jam Alerts") +
+  ggtitle("Number of Traffic Jam Alerts Over Time") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```
+8.2 
+
+```{r}
+install.packages("geosphere")
+library(geosphere)
+
+get_alerts_within_buffer <- function(dfw, input_uuid, buffer_distance) {
+  selected_accident <- dfw %>% filter(uuid == input_uuid)
+  
+  accident_longitude <- selected_accident$longitude
+  accident_latitude <- selected_accident$latitude
+  accident_location <- c(accident_longitude[1], accident_latitude[1])  
+  
+  time_range_start <- selected_accident$ts_ct_rounded - hours(1)
+  time_range_end <- selected_accident$ts_ct_rounded + hours(1)
+  
+  filtered_data <- dfw %>%
+    filter(ts_ct_rounded >= time_range_start, ts_ct_rounded <= time_range_end) |>
+    filter(geosphere::distVincentySphere(cbind(longitude, latitude), accident_location) <= buffer_distance) %>%
+    mutate(interval = cut(ts_ct_rounded, breaks = "5 min")) |>
+    count(interval)
+  
+  return(filtered_data)
+}
+
+uuid <- "68b55df9-30f0-4a7e-9556-7f11f366549b"
+buffer_distance <- 10000  
+result <- get_alerts_within_buffer(dfw, uuid, buffer_distance)
+
+print(result)
+
+```
+
 
