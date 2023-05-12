@@ -161,16 +161,7 @@ head(dfw)
 # 5
 
 ```{r message=FALSE, warning=FALSE}
-library(lubridate)
 
-# Convert alert_date to POSIXct object with unknown time zone
-dfw$alert_date <- ymd_hms(dfw$ts)
-
-# Convert alert_date to Central Time
-dfw_alert_date_ct <- with_tz(dfw$ts, "America/Chicago")
-
-# Round alert_date_ct to nearest 5 minutes
-dfw_alert_date_ct_rounded <- round_date(dfw_alert_date_ct, "5 minutes")
 ```
 
 
@@ -375,5 +366,35 @@ ggplot(ddfw_filtered, aes(x = subtype, y = score, fill = type)) +
   labs(title = "JAM Severity Scores by Subtype and Type", x = "Subtype", y = "Score")
 
 ```
-## 8 Waze aggregate over multiple events 
-##
+=======
+# 2
+
+W Chicago Ave & N Western Ave, Chicago, IL 60622 = 41.933930, -87.687884
+W George St & N Western Ave, Chicago, IL 60618 = 41.895741, -87.686892
+```{r message=FALSE, warning=FALSE}
+unique_values <- unique(dfw$street)
+unique_values
+```
+
+```{r message=FALSE, warning=FALSE}
+
+install.packages("ggmap")
+library(ggmap)
+```
+
+```{r message=FALSE, warning=FALSE}
+corridor_accidents <- dfw[dfw$street == "N Western Ave" & dfw$type == "ACCIDENT",]
+map <- get_stamenmap(bbox = c(left = min(corridor_accidents$longitude),
+                              bottom = min(corridor_accidents$latitude),
+                              right = max(corridor_accidents$longitude),
+                              top = max(corridor_accidents$latitude)),
+                     maptype = "toner-lite")
+
+
+ggmap(map) +
+  geom_point(data = corridor_accidents, aes(x = longitude, y = latitude), color = "orange", size = 2) +
+  labs(title = "Accidents on High Crash Corridor # 7 N Western Ave") +
+  theme_minimal()
+```
+
+## 7 Waze single event
